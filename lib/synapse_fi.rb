@@ -3,7 +3,7 @@ require "synapse_api/client"
 # error
 require "synapse_api/error"
 # http_request
-require "synapse_api/http_request"
+require "synapse_api/http_client"
 # node
 require "synapse_api/node"
 # nodes
