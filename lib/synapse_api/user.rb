@@ -146,7 +146,7 @@ module Synapse
     # @return [Synapse::Node] or [Hash]
     def create_node(payload:, **options)
 			response = post("/nodes", payload, **options)
-			Node.from_response(response, **options)
+			Node.from_response(response['nodes'].first, **options) # ???
      end
 
     # Submit answer to a MFA question using access token from bank login attempt
