@@ -39,7 +39,7 @@ module Synapse
     # @return [Synapse::User]
     def user_update(payload:)
       response = patch("", payload)
-			self.from_response(response, client: client)
+      User.from_response(response, client: client)
      end
 
     # Queries the API for a node belonging to user
