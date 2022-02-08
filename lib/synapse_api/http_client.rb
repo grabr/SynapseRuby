@@ -102,7 +102,7 @@ module Synapse
 
       if raise_for_202 && response['http_code'] == '202'
         raise Error.from_response(response)
-      elsif response['error']
+      elsif error?(response)
         raise Error.from_response(response)
       else
         response
@@ -120,7 +120,7 @@ module Synapse
 
       if raise_for_202 && response['http_code'] == '202'
         raise Error.from_response(response)
-      elsif response['error']
+      elsif error?(response)
         raise Error.from_response(response)
       else
         response
@@ -138,7 +138,7 @@ module Synapse
 
       if raise_for_202 && response['http_code'] == '202'
         raise Error.from_response(response)
-      elsif response['error']
+      elsif error?(response)
         raise Error.from_response(response)
       else
         response
@@ -163,7 +163,7 @@ module Synapse
 
       if raise_for_202 && response['http_code'] == '202'
         raise Error.from_response(response)
-      elsif response['error']
+      elsif error?(response)
         raise Error.from_response(response)
       else
         response
@@ -175,6 +175,10 @@ module Synapse
     end
 
     private
+
+    def error?(response)
+      response['error'] && !response['error'].empty?
+    end
 
     # get user
     # get refresh_token

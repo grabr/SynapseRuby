@@ -30,7 +30,7 @@ module Synapse
       @refresh_token = refresh_token
       @payload = payload
       @full_dehydrate = full_dehydrate
-			@base_path = "/users/#{user_id}"
+      @base_path = "/users/#{user_id}"
     end
 
     # Updates users documents
@@ -40,7 +40,7 @@ module Synapse
     def user_update(payload:)
       response = patch("", payload)
       User.from_response(response, client: client)
-     end
+    end
 
     # Queries the API for a node belonging to user
     # @param node_id [String]
@@ -56,7 +56,7 @@ module Synapse
       options[:force_refresh] = 'no' if options[:force_refresh] == false
 
       response = get("/nodes/#{node_id}", **options)
-			Node.from_response(response, **options)
+      Node.from_response(response, **options)
     end
 
     # Queries Synapse API for all nodes belonging to user
@@ -66,9 +66,9 @@ module Synapse
     # @see https://docs.synapsepay.com/docs/node-resources node types
     # @return [Array<Synapse::Nodes>]
     def get_all_user_nodes(**options)
-			response = get("/nodes", **options)
-			Nodes.from_response(response, **options)
-     end
+      response = get("/nodes", **options)
+      Nodes.from_response(response, **options)
+    end
 
     # Quaries Synapse oauth API for uto authenitcate user
     # @params scope [Array<Strings>] (optional)
@@ -87,7 +87,7 @@ module Synapse
         self.expires_in = oauth_expires
         client.update_headers(oauth_key: oauth_key)
       end
-     end
+    end
 
     # For registering new fingerprint
     # Supply 2FA device which pin should be sent to
@@ -97,8 +97,8 @@ module Synapse
     # @return API response [Hash]
     def select_2fa_device(device:, **options)
       payload = {
-        "refresh_token": refresh_token,
-        "phone_number": device
+        "refresh_token" => refresh_token,
+        "phone_number" => device
       }
       path = oauth_path
       client.post(path, payload, **options)
@@ -112,8 +112,8 @@ module Synapse
     # @return API response [Hash]
     def confirm_2fa_pin(pin:, **options)
       payload = {
-        "refresh_token": refresh_token,
-        "validation_pin": pin
+        "refresh_token" => refresh_token,
+        "validation_pin" => pin
       }
 
       payload['scope'] = options[:scope] if options[:scope]
@@ -135,7 +135,7 @@ module Synapse
     # @param per_page [Integer] (optional) response will default to 20
     def get_user_transactions(**options)
       response = get("/trans", **options)
-			Transactions.from_response(response)
+      Transactions.from_response(response)
     end
 
     # Creates Synapse node
@@ -145,9 +145,9 @@ module Synapse
     # @see https://docs.synapsefi.com/docs/node-resources
     # @return [Synapse::Node] or [Hash]
     def create_node(payload:, **options)
-			response = post("/nodes", payload, **options)
-			Node.from_response(response['nodes'].first, **options) # ???
-     end
+      response = post("/nodes", payload, **options)
+      Node.from_response(response['nodes'].first, **options) # ???
+    end
 
     # Submit answer to a MFA question using access token from bank login attempt
     # @return [Synapse::Node] or [Hash]
@@ -159,7 +159,7 @@ module Synapse
       response = post("/nodes", payload, **options)
 
       if response['nodes']
-				nodes = Nodes.from_response(response)
+        nodes = Nodes.from_response(response)
       else
         access_token = response # ????
       end
@@ -172,7 +172,7 @@ module Synapse
     # @see https://docs.synapsefi.com/docs/generate-ubo-form
     # @return API response
     def create_ubo(payload:)
-			patch("/ubo", payload)
+      patch("/ubo", payload)
     end
 
     # Gets user statement
@@ -181,7 +181,7 @@ module Synapse
     # @see https://docs.synapsefi.com/docs/statements-by-user
     # @return API response
     def get_user_statement(**options)
-			get("/statements", **options)
+      get("/statements", **options)
     end
 
     # Request to ship CARD-US
@@ -191,7 +191,7 @@ module Synapse
     # @return [Synapse::Node] or [Hash]
     def ship_card_node(node_id:, payload:)
       response = patch("/nodes/#{node_id}?ship=YES", payload)
-			Node.from_response(repsonse)
+      Node.from_response(repsonse)
     end
 
     # Request to ship user debit card [Subnet]
@@ -201,7 +201,7 @@ module Synapse
     # @return [Synapse::Node] or [Hash]
     def ship_card(node_id:, payload:, subnet_id:)
       response = patch("/nodes/#{node_id}/subnets/#{subnet_id}/ship", payload)
-			Subnet.from_response(response)
+      Subnet.from_response(response)
     end
 
     # Resets debit card number, cvv, and expiration date
@@ -211,7 +211,7 @@ module Synapse
     # @return [Synapse::Node] or [Hash]
     def reset_card_node(node_id:)
       response = patch("/nodes/#{node_id}?reset=YES", {})
-			Node.from_response(response)
+      Node.from_response(response)
     end
 
     # Creates a new transaction in the API belonging to the provided node
@@ -220,8 +220,8 @@ module Synapse
     # @param idempotency_key [String] (optional)
     # @return [Synapse::Transaction]
     def create_transaction(node_id:, payload:, **options)
-			response = post("/nodes/#{node_id}/trans", payload, **options)
-			Transaction.from_response(response, node_id: node_id)
+      response = post("/nodes/#{node_id}/trans", payload, **options)
+      Transaction.from_response(response, node_id: node_id)
     end
 
     # Queries the API for a transaction belonging to the supplied node by transaction id
@@ -229,8 +229,8 @@ module Synapse
     # @param trans_id [String] id of the transaction to find
     # @return [Synapse::Transaction]
     def get_node_transaction(node_id:, trans_id:)
-			response = get("/nodes/#{node_id}/trans/#{trans_id}")
-			Transaction.from_response(response, node_id: node_id)
+      response = get("/nodes/#{node_id}/trans/#{trans_id}")
+      Transaction.from_response(response, node_id: node_id)
     end
 
     # Queries the API for all transactions belonging to the supplied node
@@ -240,7 +240,7 @@ module Synapse
     # @return [Array<Synapse::Transaction>]
     def get_all_node_transaction(node_id:, **options)
       response = get("/nodes/#{node_id}/trans", **options)
-			Transactions.from_response(response, node_id: node_id)
+      Transactions.from_response(response, node_id: node_id)
     end
 
     # Verifies microdeposits for a node
@@ -248,22 +248,14 @@ module Synapse
     # @param payload [Hash]
     def verify_micro_deposit(node_id:, payload:)
       response = patch("/nodes/#{node_id}", payload)
-			Node.from_response(response)
+      Node.from_response(response)
     end
 
     # Reinitiate microdeposits on a node
     # @param node_id [String]
     def reinitiate_micro_deposit(node_id:)
       response = patch("/nodes/#{node_id}?resend_micro=YES", {})
-			Node.from_response(response)
-    end
-
-    # Generate tokenized info for Apple Wallet
-    # @param node_id [String]
-    # @param payload [Hash]
-    # @see https://docs.synapsefi.com/docs/generate-applepay-token
-    def generate_apple_pay_token(node_id:, payload:)
-			patch("/nodes/#{node_id}/applepay", {})
+      Node.from_response(response)
     end
 
     # Update supp_id, nickname, etc. for a node
@@ -273,7 +265,7 @@ module Synapse
     # @return [Synapse::Node]
     def update_node(node_id:, payload:)
       response = patch "/nodes/#{node_id}", payload
-			Node.from_response(response)
+      Node.from_response(response)
     end
 
     # @param node_id [String]
@@ -289,7 +281,7 @@ module Synapse
     # @param type [String]
     # @see https://docs.synapsefi.com/docs/trigger-dummy-transactions
     def dummy_transactions(node_id:, **options)
-			get("/nodes/#{node_id}/dummy-tran")
+      get("/nodes/#{node_id}/dummy-tran")
     end
 
     # Adds comment to the transactions
@@ -298,7 +290,7 @@ module Synapse
     # @param payload [Hash]
     # @return [Synapse::Transaction]
     def comment_transaction(node_id:, trans_id:, payload:)
-			response = patch "/nodes/#{node_id}/trans/#{trans_id}", payload
+      response = patch "/nodes/#{node_id}/trans/#{trans_id}", payload
       Transaction.from_response(response, node_id: node_id)
     end
 
@@ -307,7 +299,7 @@ module Synapse
     # @param trans_id
     # @return API response [Hash]
     def cancel_transaction(node_id:, trans_id:)
-			delete("/nodes/#{node_id}/trans/#{trans_id}")
+      delete("/nodes/#{node_id}/trans/#{trans_id}")
     end
 
     # Dispute a transaction for a user
@@ -316,7 +308,7 @@ module Synapse
     # @see https://docs.synapsefi.com/docs/dispute-card-transaction
     # @return API response [Hash]
     def dispute_card_transactions(node_id:, trans_id:, payload:)
-			patch("/nodes/#{node_id}/trans/#{trans_id}/dispute", payload)
+      patch("/nodes/#{node_id}/trans/#{trans_id}/dispute", payload)
     end
 
     # Creates subnet for a node debit card or act/rt number
@@ -335,7 +327,7 @@ module Synapse
     # @param subnet_id [String]
     # @return [Synapse::Subnet]
     def update_subnet(node_id:, payload:, subnet_id:, **_options)
-			response = patch("/nodes/#{node_id}/subnets/#{subnet_id}", payload)
+      response = patch("/nodes/#{node_id}/subnets/#{subnet_id}", payload)
       Subnet.from_response(response)
     end
 
@@ -345,7 +337,7 @@ module Synapse
     # @param per_page [Integer]
     # @see https://docs.synapsefi.com/docs/all-node-subnets
     def get_all_subnets(node_id:, **options)
-			response = get("/nodes/#{node_id}/subnets", **options)
+      response = get("/nodes/#{node_id}/subnets", **options)
       Subnets.from_response(response)
     end
 
@@ -357,6 +349,15 @@ module Synapse
     def get_subnet(node_id:, subnet_id:, **options)
       response = get("/nodes/#{node_id}/subnets/#{subnet_id}", **options)
       Subnet.from_response(response)
+    end
+
+    # This endpoint allows you generate a token to push card to digital wallet.
+    # @param node_id [String]
+    # @param subnet_id [String]
+    # @param payload [Hash]
+    # @return API response [Hash]
+    def push_subnet_to_wallet(node_id:, subnet_id:, payload:, **options)
+      post("/nodes/#{node_id}/subnets/#{subnet_id}/push", payload, **options)
     end
 
     # Gets statement by node
@@ -373,7 +374,7 @@ module Synapse
     # @see https://docs.synapsefi.com/reference#generate-node-statements
     # @return API response [Hash]
     def generate_node_statements(node_id:, payload:)
-			post "/nodes/#{node_id}/statements", payload
+      post "/nodes/#{node_id}/statements", payload
     end
 
     private
@@ -382,10 +383,10 @@ module Synapse
       "/oauth/#{user_id}"
     end
 
-		def get(path, **options)
-			[options[:page], options[:per_page]].compact.each do |arg|
-				raise ArgumentError, "#{arg} must be nil or an Integer >= 1" if arg && (!arg.is_a?(Integer) || arg < 1)
-			end
+    def get(path, **options)
+      [options[:page], options[:per_page]].compact.each do |arg|
+        raise ArgumentError, "#{arg} must be nil or an Integer >= 1" if arg && (!arg.is_a?(Integer) || arg < 1)
+      end
 
       params = VALID_QUERY_PARAMS.map do |p|
         options[p] ? "#{p}=#{options[p]}" : nil
@@ -393,30 +394,30 @@ module Synapse
 
       path += '?' + params.join('&') if params.any?
 
-			with_authentication { client.get(@base_path + path) }
+      with_authentication { client.get(@base_path + path) }
     end
 
-		def post(path, payload, **options)
-			with_authentication do
-				client.post("#{@base_path}#{path}", payload, **options)
-			end
-		end
+    def post(path, payload, **options)
+      with_authentication do
+        client.post("#{@base_path}#{path}", payload, **options)
+      end
+    end
 
-		def patch(path, payload)
-			with_authentication do
-				client.patch("#{@base_path}#{path}", payload)
-			end
-		end
+    def patch(path, payload)
+      with_authentication do
+        client.patch("#{@base_path}#{path}", payload)
+      end
+    end
 
-		def delete(path)
-			with_authentication { client.delete("#{@base_path}#{path}") }
-		end
+    def delete(path)
+      with_authentication { client.delete("#{@base_path}#{path}") }
+    end
 
-		def with_authentication
-			yield
-		rescue Synapse::Error::Unauthorized
-			authenticate
-			yield
-		end
+    def with_authentication
+      yield
+    rescue Synapse::Error::Unauthorized
+      authenticate
+      yield
+    end
   end
 end
