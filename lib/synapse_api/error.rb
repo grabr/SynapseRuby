@@ -34,6 +34,9 @@ module Synapse
     # Raised on the HTTP status code 503
     ServiceUnavailable = Class.new(ServerError)
 
+    # Raised on the HTTP status code 504
+    NetworkError = Class.new(ServerError)
+
     # Raised on unexpected HTTP status codes
     Unknown = Class.new(self)
 
@@ -48,6 +51,7 @@ module Synapse
       '429' => Synapse::Error::TooManyRequests,
       '500' => Synapse::Error::InternalServerError,
       '503' => Synapse::Error::ServiceUnavailable,
+      '504' => Synapse::Error::ServiceUnavailable
     }.freeze
 
     # The SynapsePay API Error Code

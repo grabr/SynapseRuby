@@ -54,15 +54,6 @@ module Synapse
       User.from_response(response, client: client, **options)
     end
 
-    # Update headers in HTTPClient class
-    # for API request headers
-    # @param fingerprint [Hash]
-    # @param idemopotency_key [Hash]
-    # @param ip_address [Hash]
-    def update_headers(fingerprint: nil, idemopotency_key: nil, ip_address: nil)
-      client.update_headers(fingerprint: fingerprint, idemopotency_key: idemopotency_key, ip_address: ip_address)
-    end
-
     # Queries Synapse API for a user by user_id
     # @param user_id [String] id of the user to find
     # @param full_dehydrate [String] (optional) if true, returns all KYC on user
@@ -73,9 +64,6 @@ module Synapse
     def get_user(user_id:, **options)
       raise ArgumentError, 'client must be a Synapse::Client' unless is_a?(Client)
       raise ArgumentError, 'user_id must be a String' unless user_id.is_a?(String)
-
-      options[:full_dehydrate] = 'yes' if options[:full_dehydrate] == true
-      options[:full_dehydrate] = 'no' if options[:full_dehydrate] == false
 
       client.update_headers(ip_address: options[:ip_address], fingerprint: options[:fingerprint])
 

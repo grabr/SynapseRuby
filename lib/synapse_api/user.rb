@@ -388,6 +388,9 @@ module Synapse
         raise ArgumentError, "#{arg} must be nil or an Integer >= 1" if arg && (!arg.is_a?(Integer) || arg < 1)
       end
 
+      options[:full_dehydrate] = 'yes' if options[:full_dehydrate] == true
+      options[:full_dehydrate] = 'no' if options[:full_dehydrate] == false
+
       params = VALID_QUERY_PARAMS.map do |p|
         options[p] ? "#{p}=#{options[p]}" : nil
       end.compact
