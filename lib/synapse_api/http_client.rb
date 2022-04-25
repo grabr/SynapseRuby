@@ -42,22 +42,20 @@ module Synapse
 
     # Returns headers for HTTP requests.
     # @return [Hash]
-    def headers
-      user    = "#{config[:oauth_key]}|#{config[:fingerprint]}"
-      gateway = "#{config[:client_id]}|#{config[:client_secret]}"
-      headers = {
+    def build_headers(idempotency_key: nil, headers: {}, **)
+      {
         content_type: :json,
         accept: :json,
-        'X-SP-GATEWAY' => gateway,
-        'X-SP-USER' => user,
-        'X-SP-USER-IP' => config[:ip_address]
-      }
-      headers['X-SP-IDEMPOTENCY-KEY'] = config[:idemopotency_key] if config[:idemopotency_key]
-      headers
+        'X-SP-USER' => "#{config[:oauth_key]}|#{config[:fingerprint]}",
+        'X-SP-GATEWAY' => "#{config[:client_id]}|#{config[:client_secret]}",
+        'X-SP-USER-IP' => config[:ip_address],
+        **headers
+      }.tap do |h|
+        if id_key = (idempotency_key || config[:idempotency_key])
+          h['X-SP-IDEMPOTENCY-KEY'] = id_key
+        end
+      end
     end
-
-    # Alias for headers (copy of current headers)
-    alias get_headers headers
 
     # Updates current HTPP headers
     # @param fingerprint [String]
@@ -84,29 +82,7 @@ module Synapse
     # @return [Hash] API response
     # @raise [Synapse::Error] subclass depends on HTTP response
     def post(path, payload, **options)
-      # copy of current headers
-      headers = get_headers
-
-      # update the headers with idempotency_key
-      headers = headers.merge({ 'X-SP-IDEMPOTENCY-KEY' => options[:idempotency_key] }) if options[:idempotency_key]
-
-      response = with_error_handling do
-        RestClient::Request.execute(method: :post,
-                                    url: full_url(path),
-                                    payload: payload.to_json,
-                                    headers: headers,
-                                    timeout: 300)
-      end
-      puts 'RESPONSE:', JSON.parse(response) if @logging
-      response = JSON.parse(response)
-
-      if raise_for_202 && response['http_code'] == '202'
-        raise Error.from_response(response)
-      elsif error?(response)
-        raise Error.from_response(response)
-      else
-        response
-      end
+      run_request(method: :post, path: path, body: payload, **options)
      end
 
     # Sends a GET request to the given path with the given payload.
@@ -114,17 +90,7 @@ module Synapse
     # @return [Hash] API response
     # @raise [Synapse::Error] subclass depends on HTTP response
     def get(path)
-      response = with_error_handling { RestClient.get(full_url(path), headers) }
-      puts 'RESPONSE:', JSON.parse(response) if @logging
-      response = JSON.parse(response)
-
-      if raise_for_202 && response['http_code'] == '202'
-        raise Error.from_response(response)
-      elsif error?(response)
-        raise Error.from_response(response)
-      else
-        response
-      end
+      run_request(method: :get, path: path)
     end
 
     # Sends a DELETE request to the given path
@@ -132,17 +98,7 @@ module Synapse
     # @return [Hash] API response
     # @raise [Synapse::Error] subclass depends on HTTP response
     def delete(path)
-      response = with_error_handling { RestClient.delete(full_url(path), headers) }
-      puts 'RESPONSE:', JSON.parse(response) if @logging
-      response = JSON.parse(response)
-
-      if raise_for_202 && response['http_code'] == '202'
-        raise Error.from_response(response)
-      elsif error?(response)
-        raise Error.from_response(response)
-      else
-        response
-      end
+      run_request(method: :delete, path: path)
     end
 
     # Sends a PATCH request to the given path with the given payload.
@@ -150,24 +106,8 @@ module Synapse
     # @param payload [Hash]
     # @return [Hash] API response
     # @raise [Synapse::Error] subclass depends on HTTP response
-    def patch(path, payload)
-      response = with_error_handling do
-        RestClient::Request.execute(method: :patch,
-                                    url: full_url(path),
-                                    payload: payload.to_json,
-                                    headers: headers,
-                                    timeout: 300)
-      end
-      p 'RESPONSE:', JSON.parse(response) if @logging
-      response = JSON.parse(response)
-
-      if raise_for_202 && response['http_code'] == '202'
-        raise Error.from_response(response)
-      elsif error?(response)
-        raise Error.from_response(response)
-      else
-        response
-      end
+    def patch(path, payload, **options)
+      run_request(method: :patch, path: path, body: payload)
     end
 
     def oauthenticate(user_id:)
@@ -175,6 +115,28 @@ module Synapse
     end
 
     private
+
+    def run_request(method:, path:, body: nil, **options)
+      serializer = options.delete(:serializer) || :to_json.to_proc
+
+      response = with_error_handling do
+        RestClient::Request.execute(
+          method: method,
+          url: full_url(path),
+          payload: body && serializer.call(body),
+          headers: build_headers(**options),
+          timeout: 300
+        )
+      end
+
+      json = JSON.parse(response)
+
+      if (raise_for_202 && json['http_code'] == '202') || error?(json)
+        raise Error.from_response(json)
+      else
+        json
+      end
+    end
 
     def error?(response)
       response['error'] && !response['error'].empty?
