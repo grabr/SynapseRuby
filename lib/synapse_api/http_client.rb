@@ -42,7 +42,7 @@ module Synapse
 
     # Returns headers for HTTP requests.
     # @return [Hash]
-    def build_headers(idempotency_key: nil, headers: {}, **)
+    def build_headers(idempotency_key: nil, stream: false, headers: {}, **)
       {
         content_type: :json,
         accept: :json,
@@ -54,6 +54,8 @@ module Synapse
         if id_key = (idempotency_key || config[:idempotency_key])
           h['X-SP-IDEMPOTENCY-KEY'] = id_key
         end
+
+        h['Transfer-Encoding'] = 'chunked' if stream
       end
     end
 
@@ -107,7 +109,7 @@ module Synapse
     # @return [Hash] API response
     # @raise [Synapse::Error] subclass depends on HTTP response
     def patch(path, payload, **options)
-      run_request(method: :patch, path: path, body: payload)
+      run_request(method: :patch, path: path, body: payload, **options)
     end
 
     def oauthenticate(user_id:)
@@ -117,13 +119,17 @@ module Synapse
     private
 
     def run_request(method:, path:, body: nil, **options)
-      serializer = options.delete(:serializer) || :to_json.to_proc
+      if options[:stream]
+        raise 'Body must respond_to read' unless body.respond_to?(:read)
+      else
+        body = body&.to_json
+      end
 
       response = with_error_handling do
         RestClient::Request.execute(
           method: method,
           url: full_url(path),
-          payload: body && serializer.call(body),
+          payload: body,
           headers: build_headers(**options),
           timeout: 300
         )

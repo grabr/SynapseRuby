@@ -37,8 +37,8 @@ module Synapse
     # @see https://docs.synapsefi.com/docs/updating-existing-document
     # @param payload [Hash]
     # @return [Synapse::User]
-    def user_update(payload:)
-      response = patch("", payload)
+    def user_update(payload:, **options)
+      response = patch("", payload, **options)
       User.from_response(response, client: client)
     end
 
@@ -406,9 +406,9 @@ module Synapse
       end
     end
 
-    def patch(path, payload)
+    def patch(path, payload, **opts)
       with_authentication do
-        client.patch("#{@base_path}#{path}", payload)
+        client.patch("#{@base_path}#{path}", payload, **opts)
       end
     end
 
