@@ -307,8 +307,8 @@ module Synapse
     # @param trans_id
     # @see https://docs.synapsefi.com/docs/dispute-card-transaction
     # @return API response [Hash]
-    def dispute_card_transactions(node_id:, trans_id:, payload:)
-      patch("/nodes/#{node_id}/trans/#{trans_id}/dispute", payload)
+    def dispute_card_transactions(node_id:, trans_id:, payload:, **opts)
+      patch("/nodes/#{node_id}/trans/#{trans_id}/dispute", payload, **opts)
     end
 
     # Creates subnet for a node debit card or act/rt number
