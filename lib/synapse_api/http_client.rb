@@ -119,8 +119,10 @@ module Synapse
     private
 
     def run_request(method:, path:, body: nil, **options)
-      if options[:stream]
-        raise 'Body must respond_to read' unless body.respond_to?(:read)
+      # IO objects will be streamed
+      # (via adding the Transfer-Encoding: chunked) header automatically
+      if body.respond_to?(:read) && options[:stream] != false
+        options[:stream] = true
       else
         body = body&.to_json
       end
