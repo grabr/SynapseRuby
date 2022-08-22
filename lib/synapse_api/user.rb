@@ -204,6 +204,16 @@ module Synapse
       Subnet.from_response(response)
     end
 
+    # Request to view shipment info
+    # @param node_id [String]
+    # @param subnet_id [String]
+    # @param ship_id [String]
+    # @return [Synapse::Subnet] or [Hash]
+    def get_ship(node_id:, subnet_id:, ship_id:)
+      response = get("/nodes/#{node_id}/subnets/#{subnet_id}/ship/#{ship_id}")
+      Subnet.from_response(response)
+    end
+
     # Resets debit card number, cvv, and expiration date
     # @note Deprecated
     # @see https://docs.synapsefi.com/docs/reset-debit-card
