@@ -184,23 +184,13 @@ module Synapse
       get("/statements", **options)
     end
 
-    # Request to ship CARD-US
-    # @note Deprecated
-    # @param node_id [String]
-    # @param payload [Hash]
-    # @return [Synapse::Node] or [Hash]
-    def ship_card_node(node_id:, payload:)
-      response = patch("/nodes/#{node_id}?ship=YES", payload)
-      Node.from_response(repsonse)
-    end
-
     # Request to ship user debit card [Subnet]
     # @param node_id [String]
     # @param payload [Hash]
     # @param subnet_id [String]
     # @return [Synapse::Node] or [Hash]
-    def ship_card(node_id:, payload:, subnet_id:)
-      response = patch("/nodes/#{node_id}/subnets/#{subnet_id}/ship", payload)
+    def ship_card(node_id:, payload:, subnet_id:, **options)
+      response = post("/nodes/#{node_id}/subnets/#{subnet_id}/ship", payload, **options)
       Subnet.from_response(response)
     end
 
