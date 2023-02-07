@@ -50,6 +50,7 @@ module Synapse
       '409' => Synapse::Error::Conflict,
       '429' => Synapse::Error::TooManyRequests,
       '500' => Synapse::Error::InternalServerError,
+      '502' => Synapse::Error::ServiceUnavailable,
       '503' => Synapse::Error::ServiceUnavailable,
       '504' => Synapse::Error::ServiceUnavailable
     }.freeze
