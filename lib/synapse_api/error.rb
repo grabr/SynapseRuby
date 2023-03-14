@@ -16,6 +16,9 @@ module Synapse
     # Raised on the HTTP status code 402
     RequestDeclined = Class.new(ClientError)
 
+    # Raised on the HTTP status 403 (CloudFlare)
+    RequestBlocked = Class.new(ClientError)
+
     # Raised on the HTTP status code 404
     NotFound = Class.new(ClientError)
 
@@ -46,6 +49,7 @@ module Synapse
       '400' => Synapse::Error::BadRequest,
       '401' => Synapse::Error::Unauthorized,
       '402' => Synapse::Error::RequestDeclined,
+      '403' => Synapse::Error::RequestBlocked,
       '404' => Synapse::Error::NotFound,
       '409' => Synapse::Error::Conflict,
       '429' => Synapse::Error::TooManyRequests,
