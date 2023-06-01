@@ -204,6 +204,10 @@ module Synapse
       Subnet.from_response(response)
     end
 
+    def get_card_shipments(node_id:, subnet_id:, **options)
+      get("/nodes/#{node_id}/subnets/#{subnet_id}/ship", **options)
+    end
+
     # Resets debit card number, cvv, and expiration date
     # @note Deprecated
     # @see https://docs.synapsefi.com/docs/reset-debit-card
