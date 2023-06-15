@@ -208,6 +208,10 @@ module Synapse
       get("/nodes/#{node_id}/subnets/#{subnet_id}/ship", **options)
     end
 
+    def cancel_card_shipment(node_id:, subnet_id:, ship_id:)
+      delete("/nodes/#{node_id}/subnets/#{subnet_id}/ship/#{ship_id}")
+    end
+
     # Resets debit card number, cvv, and expiration date
     # @note Deprecated
     # @see https://docs.synapsefi.com/docs/reset-debit-card
