@@ -6,7 +6,7 @@ module Synapse
   # Initializes various wrapper settings such as development mode and request
   # header values
   class Client
-    VALID_QUERY_PARAMS = %i[query page per_page full_dehydrate radius zip lat lon limit currency ticker_symbol].freeze
+    VALID_QUERY_PARAMS = %i[filter query page per_page full_dehydrate radius zip lat lon limit currency ticker_symbol].freeze
 
     attr_accessor :http_client
     attr_reader :client_id
