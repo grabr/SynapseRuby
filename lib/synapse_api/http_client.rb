@@ -123,8 +123,8 @@ module Synapse
       # (via adding the Transfer-Encoding: chunked) header automatically
       if body.respond_to?(:read) && options[:stream] != false
         options[:stream] = true
-      else
-        body = body&.to_json
+      elsif body.is_a?(Hash)
+        body = body.to_json
       end
 
       response = with_error_handling do
